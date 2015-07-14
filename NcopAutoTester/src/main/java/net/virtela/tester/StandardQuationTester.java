@@ -7,6 +7,7 @@ import net.virtela.utils.PageElement;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.Test;
 
 import com.relevantcodes.extentreports.ExtentTest;
@@ -46,10 +47,40 @@ public class StandardQuationTester extends NcopTester {
 	}
 
 	@Test(dependsOnMethods = { "loginToNcop" }, alwaysRun = true, priority = 1)
-	public void createManualProject() {
+	public void createManualProject() throws InterruptedException {
 		final ExtentTest pmDashTest = this.extentReport.startTest("PM Dashboard", "Open PM Dashboard to view Projects in the queue");
 		this.openPricingDashboard();
 		pmDashTest.log(LogStatus.PASS, "PM Dashboard Opened");
+		
+		
+		Thread.sleep(1000);
+		this.driver.switchTo().frame(PageElement.PM_DASH_IFRAME_ONE);		
+		this.driver.switchTo().frame(PageElement.PM_DASH_IFRAME_TWO);		
+		this.driver.findElement(By.id(PageElement.PM_DASH_CREATE_PROJECT_BUTTON)).click();
+		
+		this.wait.until(ExpectedConditions.presenceOfElementLocated(By.name(PageElement.PM_DASH_CUSTOMER_NAME_INPUT)));
+		//Input Customer Name
+		this.driver.findElement(By.name(PageElement.PM_DASH_CUSTOMER_NAME_INPUT)).sendKeys("TEST CUSTOMER");
+		//Input CRM Quote ID
+		this.driver.findElement(By.name(PageElement.PM_DASH_CRM_QUOTE_ID_INPUT)).sendKeys("TEST CRM");
+		
+		Select accountManager = new Select(driver.findElement(By.name(PageElement.PM_DASH_ACCOUNT_MANAGER_INPUT)));
+		Select salesEngineer = new Select(driver.findElement(By.name(PageElement.PM_DASH_SALES_ENGINEER_INPUT)));
+		Select pricingManager = new Select(driver.findElement(By.name(PageElement.PM_DASH_PRICING_MANAGER_INPUT)));
+		
+		accountManager.selectByIndex(3);
+		salesEngineer.selectByIndex(5);
+		pricingManager.selectByIndex(30);		
+		
+		//Input Sales Due Date
+		this.driver.findElement(By.name(PageElement.PM_DASH_SALES_DUE_DATE_INPUT)).sendKeys("7/21/2015");
+		//Input Project Summary
+		this.driver.findElement(By.name(PageElement.PM_DASH_PROJECT_SUMMARY_INPUT)).sendKeys("TEST PROJ SUMMARY");
+		//Save Project		
+		this.driver.findElement(By.id(PageElement.PM_DASH_SAVE_PROJECT_BUTTON)).click();
+		pmDashTest.log(LogStatus.PASS, "PM Dashboard Created New Project");
+		
+		
 		this.extentReport.endTest(pmDashTest);
 	}
 
